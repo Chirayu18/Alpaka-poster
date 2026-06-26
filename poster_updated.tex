@@ -1,0 +1,449 @@
+% ======================================================================
+%  Alpaka-based Pixel Digi Morphing -- A0 portrait poster
+%  All plots taken directly from the CMS DP note (digi morphing).
+%  Build:  pdflatex poster_digimorphing.tex   (run once; no refs)
+% ======================================================================
+\documentclass[fontsize=24pt,portrait]{scrartcl}
+
+\usepackage[a0paper,landscape=false,hmargin=17mm,top=12mm,bottom=10mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{url}
+
+% ---- CMS-style colours -------------------------------------------------
+\definecolor{cmsnavy}{HTML}{14274A}
+\definecolor{cmsred}{HTML}{C8102E}
+\definecolor{cmsgold}{HTML}{FFC60B}
+\definecolor{cmsblue}{HTML}{2D5BA8}
+\definecolor{cmsgreen}{HTML}{1B7A3D}
+\definecolor{softgray}{HTML}{EEF1F6}
+\definecolor{alpwool}{HTML}{E9DCC9}
+\definecolor{alpwool2}{HTML}{D8C7AE}
+
+% ---- a small cartoon alpaca (vector). #1=scale  #2=wool fill  #3=scarf colour ----
+\newcommand{\alpaca}[3]{%
+\begin{scope}[scale=#1]
+  \fill[#2] (-0.28,-0.55) rectangle (-0.16,-0.05);
+  \fill[#2] (0.16,-0.55) rectangle (0.28,-0.05);
+  \fill[cmsnavy] (-0.28,-0.58) rectangle (-0.16,-0.50);
+  \fill[cmsnavy] (0.16,-0.58) rectangle (0.28,-0.50);
+  \fill[#2] (0,0) ellipse (0.45 and 0.30);
+  \fill[#2] (0.42,0.10) circle (0.10);
+  \fill[#2] (-0.30,0.10) -- (-0.42,0.75) -- (-0.20,0.78) -- (-0.12,0.15) -- cycle;
+  \fill[#2] (-0.34,0.85) ellipse (0.17 and 0.20);
+  \fill[#2] (-0.46,1.02) -- (-0.50,1.22) -- (-0.40,1.06) -- cycle;
+  \fill[#2] (-0.26,1.04) -- (-0.22,1.24) -- (-0.32,1.08) -- cycle;
+  \fill[alpwool2] (-0.46,0.80) ellipse (0.07 and 0.09);
+  \fill[cmsnavy] (-0.40,0.92) circle (0.028);
+  \fill[#3] (-0.44,0.55) -- (-0.16,0.60) -- (-0.17,0.50) -- (-0.45,0.45) -- cycle;
+\end{scope}}
+
+% a "broken" alpaca: split into a front fragment and a rear fragment with a gap
+\newcommand{\alpacafrag}[2]{% #1 scale  #2 wool
+\begin{scope}[scale=#1]
+  \fill[#2] (-0.28,-0.55) rectangle (-0.16,-0.05);
+  \fill[#2] (-0.10,0) ellipse (0.22 and 0.28);
+  \fill[#2] (-0.30,0.10) -- (-0.42,0.75) -- (-0.20,0.78) -- (-0.12,0.15) -- cycle;
+  \fill[#2] (-0.34,0.85) ellipse (0.17 and 0.20);
+  \fill[#2] (-0.46,1.02) -- (-0.50,1.22) -- (-0.40,1.06) -- cycle;
+  \fill[#2] (-0.26,1.04) -- (-0.22,1.24) -- (-0.32,1.08) -- cycle;
+  \fill[cmsnavy] (-0.40,0.92) circle (0.028);
+  \fill[#2] (0.16,-0.55) rectangle (0.28,-0.05);
+  \fill[#2] (0.30,0.05) ellipse (0.20 and 0.24);
+  \fill[#2] (0.46,0.12) circle (0.09);
+\end{scope}}
+
+% ---- full-width "alpaca morphing" pun: broken -> dilate(+helper) -> erode(recovered) ----
+% #1 = total width (a number, in cm)
+\newcommand{\alpacamorph}[1]{%
+\begin{tikzpicture}[>={Latex[length=3mm]}, font=\sffamily]
+  \pgfmathsetmacro{\hw}{#1}\pgfmathsetmacro{\u}{\hw/15}%
+  \fill[cmsgreen!18] (0,0) rectangle (\hw,0.14);
+  \draw[cmsgreen!55,line width=1pt] (0,0.14) -- (\hw,0.14);
+  % broken
+  \begin{scope}[shift={(1.6*\u,0.55)}]\alpacafrag{0.8}{alpwool}\end{scope}
+  \draw[->,cmsgreen!70,line width=0.8pt] (3.0*\u,0.7) -- (4.5*\u,0.7);
+  % +helper (two overlapping, faint helper)
+  \begin{scope}[shift={(5.9*\u,0.55)}]\alpaca{0.8}{alpwool}{cmsgold}\end{scope}
+  \begin{scope}[shift={(6.4*\u,0.55)},opacity=0.45]\alpaca{0.8}{alpwool2}{cmsgold}\end{scope}
+  \draw[->,cmsgreen!70,line width=0.8pt] (8.1*\u,0.7) -- (9.6*\u,0.7);
+  % recovered
+  \begin{scope}[shift={(11.1*\u,0.55)}]\alpaca{0.85}{alpwool}{cmsred}\end{scope}
+  % happy bystanders
+  \begin{scope}[shift={(13.2*\u,0.55)}]\alpaca{0.8}{alpwool}{cmsblue}\end{scope}
+  \begin{scope}[shift={(14.4*\u,0.55)}]\alpaca{0.8}{alpwool2}{cmsgreen}\end{scope}
+\end{tikzpicture}}
+
+% ---- clickable links (load after colours are defined) ------------------
+\usepackage[colorlinks=true,urlcolor=cmsnavy,linkcolor=cmsnavy,citecolor=cmsnavy]{hyperref}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\setlist[itemize]{leftmargin=7mm,itemsep=1.4mm,topsep=1mm,parsep=0pt,
+  label=\textcolor{cmsred}{\textbf{\textbullet}}}
+
+% ---- block environment (boxed section with coloured title bar) ---------
+\newlength{\blockw}
+\newlength{\blockin}
+\newsavebox{\blockbox}
+\newcommand{\currblocktitle}{}
+\newenvironment{block}[1]{%
+  \par
+  \setlength{\blockw}{\linewidth}\addtolength{\blockw}{-3pt}%
+  \setlength{\blockin}{\blockw}\addtolength{\blockin}{-8mm}%
+  \renewcommand{\currblocktitle}{#1}%
+  \begin{lrbox}{\blockbox}%
+  \begin{minipage}{\blockin}\setlength{\parskip}{1.8mm}%
+}{%
+  \end{minipage}%
+  \end{lrbox}%
+  \begin{tikzpicture}[baseline=(blk.north)]
+  \node[inner sep=0pt, draw=cmsnavy, line width=1.2pt, fill=white] (blk) {%
+    \begin{minipage}{\blockw}%
+      {\setlength{\fboxsep}{0pt}%
+       \colorbox{cmsnavy}{\makebox[\blockw][l]{%
+         \rule[-3mm]{0pt}{16mm}\hspace{4mm}\textcolor{white}{\bfseries\large\currblocktitle}}}}\par
+      \vspace{3mm}\hspace{4mm}\usebox{\blockbox}\par\vspace{3.5mm}
+    \end{minipage}};
+  \end{tikzpicture}\par
+}
+% fixed small gap between blocks (no stretch -> tightly packed boxes)
+\newcommand{\bsep}{\par\vspace{2mm}}
+\newsavebox{\bannerbox}
+\newlength{\colwd}
+
+% single centred figure: {file}{width-fraction}{caption}
+\newcommand{\posterfig}[3]{%
+  \par\vspace{1mm}\centering
+  \includegraphics[width=#2\linewidth]{#1}\par
+  \vspace{1mm}{\footnotesize\itshape\color{black!72} #3}\par
+  \raggedright\vspace{0.5mm}}
+
+% two side-by-side figures: {fileL}{fileR}{wfrac}{caption}
+\newcommand{\pairfig}[4]{%
+  \par\vspace{1mm}\centering
+  \begin{minipage}[c]{#3\linewidth}\centering\includegraphics[width=\linewidth]{#1}\end{minipage}\hfill
+  \begin{minipage}[c]{#3\linewidth}\centering\includegraphics[width=\linewidth]{#2}\end{minipage}\par
+  \vspace{1mm}{\footnotesize\itshape\color{black!72} #4}\par
+  \raggedright\vspace{0.5mm}}
+
+% two stacked figures: {fileTop}{fileBot}{wfrac}{caption}
+\newcommand{\stackfig}[4]{%
+  \par\vspace{1mm}\centering
+  \includegraphics[width=#3\linewidth]{#1}\par\vspace{2mm}
+  \includegraphics[width=#3\linewidth]{#2}\par
+  \vspace{1mm}{\footnotesize\itshape\color{black!72} #4}\par
+  \raggedright\vspace{0.5mm}}
+
+\begin{document}
+
+% =====================================================================
+%  TITLE BANNER  (saved to a box so we can measure its height)
+% =====================================================================
+\sbox\bannerbox{%
+{\setlength{\fboxsep}{0pt}%
+\colorbox{cmsnavy}{%
+  \parbox{\textwidth}{%
+    \vspace{6mm}\par
+    \hspace{7mm}%
+    \begin{minipage}[c]{0.125\textwidth}\centering
+      \includegraphics[width=0.80\linewidth]{posterfigs/cms_logo.png}
+    \end{minipage}\hfill
+    \begin{minipage}[c]{0.70\textwidth}\centering
+      {\color{white}\bfseries\fontsize{56}{62}\selectfont Alpaka-based Pixel Digi Morphing}\\[3mm]
+      {\color{cmsgold}\bfseries\fontsize{30}{36}\selectfont Radiation-damage mitigation at the CMS High-Level Trigger (HLT) in Run~3}\\[6mm]
+      {\color{white}\fontsize{26}{30}\selectfont Chirayu Gupta$^{1}$, Saranya Nandakumar$^{1}$, Martin Delcourt$^{1}$, Henriette Petersen$^{2}$ --- on behalf of the CMS Collaboration}\\[1mm]
+      {\color{white}\fontsize{20}{24}\selectfont $^{1}$Vrije Universiteit Brussel (VUB, IIHE) \quad $^{2}$Université catholique de Louvain (UCL)}\\[2mm]
+    \end{minipage}\hfill
+    \begin{minipage}[c]{0.135\textwidth}\centering
+      {\setlength{\fboxsep}{4pt}\colorbox{white}{\includegraphics[width=0.95\linewidth]{posterfigs/iihe_logo_hi.png}}}
+    \end{minipage}%
+    \hspace{7mm}\par
+    \vspace{6mm}
+  }}}%
+}% end \sbox\bannerbox
+% place banner, then three natural-height top-aligned columns
+\setlength{\colwd}{\dimexpr(\textwidth-22mm)/3\relax}
+\usebox\bannerbox\par
+\vspace{1mm}{\color{cmsred}\rule{\textwidth}{3pt}}\par
+\vspace{-2mm}
+% =====================================================================
+%  THREE TOP-ALIGNED COLUMNS (tightly packed, fixed gaps)
+% =====================================================================
+\noindent
+\begin{minipage}[t]{\colwd}
+% ====================================================== COLUMN 1
+\begin{block}{Overview}
+The CMS pixel detector (1{,}856 modules) is the innermost tracker sub-system. Through Run~3
+the LHC has delivered $>$350~fb$^{-1}$, causing significant \textbf{radiation
+damage} to the barrel pixel layer closest to the beam (BPIX~L1). The degradation of charge
+collection efficiency is most pronounced at large pseudorapidity, where shallow track
+angles --- due to the per-pixel charge threshold --- can lead to
+\textbf{truncated or broken clusters} that bias hit reconstruction.
+\par\smallskip
+\emph{Digi morphing} is a mitigation that applies a \textbf{morphological closing}
+at the pixel-\emph{digi} level to recover cluster connectivity. It was deployed
+in offline and HLT reconstruction during 2025.
+\end{block}
+
+\bsep
+\begin{block}{Motivation: broken \& shortened clusters}
+Radiation damage lowers the charge collection efficiency, so charge deposits can fall
+below the per-pixel threshold. For \textbf{shallow-angle} tracks at high $|\eta|$ this
+leaves:
+\begin{itemize}
+  \item \textbf{broken clusters}: internal gaps split one cluster into fragments;
+  \item \textbf{shortened clusters}: the reconstructed extent is truncated.
+\end{itemize}
+Digi morphing recovers \textbf{broken} clusters by bridging internal gaps, but
+\textbf{cannot recover shortened clusters}, where charge is lost at the cluster ends.
+\stackfig{posterfigs/sensor_broken_hr.png}{posterfigs/sensor_short_hr.png}{0.85}{Sensor
+cross-sections: along a shallow track the collected charge can dip below the
+per-pixel threshold, \textbf{breaking} the cluster into fragments (top) or
+\textbf{shortening} its reconstructed extent (bottom). Adapted from
+Chiochia~et~al.~[1].}
+\end{block}
+
+\bsep
+\begin{block}{The digi morphing algorithm}
+An image-processing \textbf{morphological closing} is applied directly to the
+pixel digis:
+\begin{itemize}
+  \item \textbf{Dilation:} a $3{\times}3$ kernel expands cluster boundaries,
+        bridging the internal sub-threshold gaps;
+  \item \textbf{Erosion:} restores the original cluster extent while keeping the
+        recovered pixels.
+\end{itemize}
+The inserted \textbf{helper digis} are temporary connectivity markers --- they
+carry no charge and are \emph{not} used to estimate the hit position, so the
+position remains unbiased.
+\posterfig{posterfigs/cand_E_final_T.pdf}{0.92}{\textbf{Figure~1:} BPIX~L1 module
+($\eta\!\sim\!-2.3$, 25~July~2024). Helper digis (black) added in dilation, then
+eroded, let the clusterizer merge digis from a single broken cluster.}
+\end{block}
+
+\bsep
+\begin{block}{Implementation \& deployment}
+\begin{itemize}
+  \item Written in the \textbf{alpaka} portability library~[2] $\Rightarrow$ runs
+        unchanged on \textbf{CPU and GPU}; inserted before the pixel clusterizer in
+        pixel local reconstruction at HLT.
+  \item Morphed regions are \textbf{fully configurable} via configuration flags.
+  \item Merged into \textbf{CMSSW}, featuring several subsequent optimizations.
+  \item \textbf{Deployed at the HLT} from LHC Fill~11200 (17~October~2025).
+\end{itemize}
+\end{block}
+
+\bsep
+\begin{block}{Impact on clusters in data}
+\posterfig{posterfigs/fig3_303042568.pdf}{0.94}{\textbf{Figure~2:} cluster
+reconstruction with morphing disabled (left, 12 clusters) and enabled (right, 5
+clusters), BPIX~L1, $\eta\!\sim\!-2.4$, 14~October~2025. Broken fragments are
+reconnected and nearby components merged, reducing combinatorics.}
+Beyond reconnecting broken clusters, morphing \textbf{merges fragments consistent
+with the same track incidence angle}, lowering the number of reconstructed clusters.
+Limitations are \textbf{over-merging} of fragments from different tracks and
+\textbf{under-merging} when the gap is too large for the kernel to bridge.
+\end{block}
+
+\vspace{1mm}
+\begin{center}
+\pgfmathsetmacro{\colwcm}{0.995*\linewidth/28.4527}% linewidth in cm
+\alpacamorph{\colwcm}
+\end{center}
+
+\end{minipage}\hfill
+\begin{minipage}[t]{\colwd}
+% ====================================================== COLUMN 2
+\begin{block}{Application: targeted regions}
+Morphing is enabled only in the BPIX module rings (along $z$) that see the most
+shallow-angle tracks and the largest cluster-size loss:
+\begin{itemize}
+  \item \textbf{BPIX Layer~1:} rings 1, 2, 7, 8 \;($|\eta|\gtrsim2.2$);
+  \item \textbf{BPIX Layer~2:} rings 1, 8 \;($|\eta|\gtrsim1.8$).
+\end{itemize}
+This conservative, region-targeted choice confines the algorithm to the phase
+space where it helps most, leaving the rest of the detector untouched.
+\pairfig{posterfigs/config_grid_hr.png}{posterfigs/detector_regions_hr.png}{0.49}{Enabled
+(\textbullet) vs disabled ($\otimes$) module rings (left), and the corresponding
+highlighted regions on the Phase-1 pixel detector (right, modified from~[3]).}
+\end{block}
+
+\bsep
+\begin{block}{HLT local hit resolution}
+\textbf{Simulated single muons} with no additional collisions (no pile-up), each
+with $p_{T}\approx10$~GeV and crossing the forward part of the inner barrel layer
+($2<|\eta|<3$, BPIX~L1). The reconstructed hit is compared to the true simulated
+position. The residual in local~$y$ is \textbf{bimodal}: broken or shortened
+clusters pull the hit in opposite directions depending on the track's incidence
+angle.
+\pairfig{posterfigs/recHitXResLayer1.pdf}{posterfigs/recHitYResLayer1.pdf}{0.45}{\textbf{Figure~3:}
+hit residual (RecHit $-$ SimHit) in local~$x$ (left) and local~$y$ (right), BPIX~L1.
+Blue: morphing disabled; red: enabled.}
+\begin{itemize}
+  \item Local-$y$ RMS \textbf{256.6\,$\rightarrow$\,213.1\,$\mu$m} --- the bimodal
+        lobes collapse toward zero;
+  \item Local-$x$ essentially unchanged (33.0\,$\rightarrow$\,32.4\,$\mu$m) since
+        radiation damage resulting in broken clusters mainly affects the local-$y$
+        coordinate.
+\end{itemize}
+The no-pile-up configuration isolates the local-reconstruction effect, so the RMS
+reduction directly measures the recovered hit quality.
+\end{block}
+
+\bsep
+\begin{block}{HLT tracking: efficiency \& purity}
+\textbf{Simulated $\mathrm{t\bar{t}}$ events} at $\sqrt{s}=13.6$~TeV with realistic
+Run-3 pile-up.
+\pairfig{posterfigs/effic.pdf}{posterfigs/fakeduprate_vs_eta.pdf}{0.435}{\textbf{Figure~4:}
+track-finding efficiency (left) and fake$+$duplicate rate (right) vs track $\eta$.
+Gains are concentrated at high $|\eta|$.}
+\begin{itemize}
+  \item Efficiency up \textbf{$\sim$5\% (15\%)} for $2.0<|\eta|<2.5$
+        ($|\eta|>2.5$);
+  \item simultaneous reduction of the fake$+$duplicate rate.
+\end{itemize}
+The gain mirrors the cluster recovery seen in data and is concentrated in the
+forward region, where broken clusters are most frequent --- the central region lies
+outside the morphed rings and is unchanged by construction.
+\end{block}
+
+\bsep
+\begin{block}{HLT tracking: impact parameter \& $\boldsymbol{p_{T}}$}
+\pairfig{posterfigs/dzres_vs_eta_Sigma.pdf}{posterfigs/ptres_vs_eta_Sigma.pdf}{0.46}{\textbf{Figure~5:}
+resolution of the longitudinal impact parameter $d_{z}$ (left) and of $p_{T}$
+(right) vs track $\eta$.}
+\begin{itemize}
+  \item $d_{z}$ resolution improved by up to \textbf{$\sim$50\%} at high $|\eta|$;
+  \item $p_{T}$ resolution unchanged
+\end{itemize}
+\textbf{Better hits $\Rightarrow$ better tracks}: the recovered local-$y$
+resolution feeds directly into improved efficiency and impact-parameter
+resolution in the forward region. The $d_{z}$ gain is especially relevant for
+primary-vertex association and pile-up rejection, while the unchanged $p_{T}$
+resolution confirms that morphing adds no bias to the track curvature
+measurement. All metrics are evaluated with the standard Run-3 HLT tracking
+validation~[4].
+\end{block}
+
+\end{minipage}\hfill
+\begin{minipage}[t]{\colwd}
+% ====================================================== COLUMN 3
+\begin{block}{Cluster-size trends in data}
+The most-irradiated \textbf{BPIX~L1} cluster size, which had fallen fill by fill,
+\textbf{stabilises} once digi morphing is enabled --- in \emph{both} transverse
+directions and most prominently for the outer ladders.
+\pairfig{posterfigs/hlt_sizex_inner_0.pdf}{posterfigs/hlt_sizex_outer_0.pdf}{0.498}{\textbf{Figure~6
+(local~$x$):} HLT on-track cluster size-$x$ vs delivered integrated luminosity for
+inner (left) and outer (right) BPIX L1--4 ladders.}
+\pairfig{posterfigs/hlt_sizey_vs_eta_inner_0.pdf}{posterfigs/hlt_sizey_vs_eta_outer_0.pdf}{0.498}{\textbf{Figure~7
+(local~$y$):} HLT on-track cluster size-$y$ vs delivered integrated luminosity,
+split in pseudorapidity, for inner (left) and outer (right) BPIX~L1 ladders.
+Dashed line: 17~October~2025, where morphing was enabled at the HLT.}
+\end{block}
+
+\bsep
+\begin{block}{Physics performance: $\boldsymbol{J/\psi}$ scouting}
+The HLT scouting stream is taken at a higher rate with reduced event content and no
+offline reconstruction~[7]. The downstream physics impact is measured with
+HLT-scouting dimuons without vertex constraint (NoVtx), comparing data
+\textbf{before} and \textbf{after} morphing was enabled at the HLT on 17~October~2025.
+\pairfig{posterfigs/jpsi_n_sig_vs_eta.png}{posterfigs/fit_eta_11.png}{0.495}{\textbf{Figures~8--9:}
+J/$\psi$ peak yield vs dimuon $\eta_{\mu\mu}$ (left, lower panel: relative shift),
+and the dimuon invariant-mass peak for $2.0\le\eta_{\mu\mu}<2.4$ (right).}
+\begin{itemize}
+  \item J/$\psi$ yield rises by \textbf{up to $\sim$8--9\%} in the forward region,
+        where radiation damage is worst;
+  \item accompanied by a \textbf{narrower, taller J/$\psi$ mass peak} --- a direct
+        sign of improved forward tracking.
+\end{itemize}
+\textbf{Better tracks $\Rightarrow$ better physics.}
+\end{block}
+
+\bsep
+\begin{block}{Timing \& throughput}
+20{,}000 events on HLT nodes (2$\times$AMD~EPYC~7763 $+$ 2$\times$NVIDIA~T4), 12
+timed repetitions after warm-up.
+\par\vspace{2mm}
+{\centering\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}p{0.40\blockin}>{\raggedleft\arraybackslash}p{0.27\blockin}>{\raggedleft\arraybackslash}p{0.27\blockin}@{}}
+\toprule
+\textbf{Configuration} & \textbf{Time/event (ms)} & \textbf{Events/s}\\
+\midrule
+Morphing \textcolor{cmsred}{OFF} & $480.0\pm0.5$ & $538.9\pm1.7$\\
+Morphing \textcolor{cmsgreen}{ON}  & $482.0\pm0.7$ & $536.5\pm2.4$\\
+\bottomrule
+\end{tabular}\par}
+\vspace{2mm}
+The Pixel ($\sim$10.4\%) and Tracking ($\sim$23\%) HLT time fractions are
+unchanged $\Rightarrow$ digi morphing comes at a \textbf{negligible cost}. The
+morphological closing is a small, fully parallel operation per module, so it adds
+no measurable latency to the GPU pixel-reconstruction step and leaves the overall
+HLT throughput budget intact.
+\end{block}
+
+\bsep
+\begin{block}{Summary}
+Intervention at \emph{local reconstruction}, motivated by detector physics,
+propagates all the way to physics observables:
+\par\vspace{3mm}
+{\centering
+\begin{tikzpicture}[every node/.style={font=\normalsize},
+  fb/.style={rectangle, rounded corners=3mm, draw=black!25, line width=0.5pt,
+    text width=\dimexpr\blockin-20mm\relax, align=center, inner sep=1.8mm,
+    text=white, font=\small\bfseries},
+  ar/.style={-{Latex[length=2.5mm,width=2mm]}, line width=0.8pt, draw=cmsnavy}]
+\node[fb, fill=cmsred!88] (a) {Radiation damage in late Run~3};
+\node[fb, fill=cmsred!72, below=2.6mm of a] (b) {Broken / shortened clusters at high $\eta$};
+\node[fb, fill=cmsnavy, draw=cmsgold, line width=1.6pt, below=2.6mm of b] (c)
+  {\textcolor{cmsgold}{DIGI MORPHING}\\[0.5mm]\footnotesize dilation $+$ erosion $\Rightarrow$ helper digis};
+\node[fb, fill=cmsblue!85, below=2.6mm of c] (d) {Cluster connectivity restored};
+\node[fb, fill=cmsgreen!68, below=2.6mm of d] (e) {Improved local-$y$ hit resolution};
+\node[fb, fill=cmsgreen!82, below=2.6mm of e] (f) {Improved tracking efficiency \& $d_{z}$ resolution};
+\node[fb, fill=cmsgreen, below=2.6mm of f] (g) {Signs of improved physics performance at high $|\eta|$ (J/$\psi$ yield)};
+\draw[ar](a)--(b); \draw[ar](b)--(c); \draw[ar](c)--(d);
+\draw[ar](d)--(e); \draw[ar](e)--(f); \draw[ar](f)--(g);
+\end{tikzpicture}\par}
+\vspace{3mm}
+All of this comes at a \textbf{negligible HLT timing cost}.
+\end{block}
+
+\bsep
+\begin{block}{References}
+{\scriptsize
+[1] V.~Chiochia \emph{et al.}, ``Simulation of heavily irradiated silicon pixel
+sensors\ldots'', \emph{IEEE TNS} \textbf{52} (2005) 1067,
+\href{https://doi.org/10.1109/TNS.2005.852748}{doi:10.1109/TNS.2005.852748}.\\[1mm]
+[2] A.~Bocci \emph{et al.}, ``Heterogeneous reconstruction of tracks and primary
+vertices with the CMS pixel tracker'', \emph{Front. Big Data} (2020),
+\href{https://doi.org/10.3389/fdata.2020.601728}{doi:10.3389/fdata.2020.601728}.\\[1mm]
+[3] T.~A.~Vami (CMS), ``Calibration and performance of the CMS pixel detector in
+LHC Run~2'', \href{https://pos.sissa.it/350/010}{PoS(LHCP2019)010}.\\[1mm]
+[4] CMS Coll., ``Performance of Run-3 HLT track reconstruction'',
+CMS-DP-2022-014.\\[1mm]
+[5] CMS Coll. ``Alpaka-based Pixel Digi Morphing for Radiation Damage Mitigation at the CMS HLT'' CMS DP-2026/\\[1mm]
+[6] CMS Coll. ``Pixel Detector Performance in 2025'' CMS DP-2026/096\\[1mm]
+[7] CMS Coll. ``Output rates and bandwidth of the High-Level Trigger during 2026 proton-proton runs'' CMS-DP-2026-023}
+\end{block}
+
+\bsep
+\begin{center}
+  \includegraphics[width=0.42\linewidth]{alpaka.png}
+\end{center}
+
+\end{minipage}
+
+\end{document}
